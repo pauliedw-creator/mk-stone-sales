@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>MK Stone — Rejestr sprzedaży</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --stone-900:#1c1e1d;
+    --stone-700:#3d423f;
+    --stone-500:#6c736e;
+    --stone-300:#b9bdb8;
+    --stone-100:#e8e9e5;
+    --stone-050:#f4f4f1;
+    --patina:#4a6b5d;
+    --patina-deep:#2f4a3e;
+    --alert:#8c3b2e;
+    --gold:#a8863f;
+    --radius:3px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter Tight',system-ui,sans-serif;
+    background:var(--stone-050);
+    color:var(--stone-900);
+    font-size:16px;
+    line-height:1.45;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px 64px;}
+
+  /* ---------- masthead ---------- */
+  header{
+    border-bottom:2px solid var(--stone-900);
+    padding:22px 0 14px;
+    margin-bottom:26px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .mark{display:flex;align-items:baseline;gap:10px;}
+  .mark .name{
+    font-family:'Newsreader',Georgia,serif;
+    font-size:28px;
+    letter-spacing:-0.01em;
+    line-height:1;
+  }
+  .mark .rule{
+    width:1px;height:20px;background:var(--stone-300);
+  }
+  .mark .sub{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    color:var(--stone-500);
+  }
+  .langbar{display:flex;gap:0;border:1px solid var(--stone-300);border-radius:var(--radius);overflow:hidden;flex:none;}
+  .langbar button{
+    -webkit-appearance:none;appearance:none;white-space:nowrap;
+    font-family:inherit;font-size:12px;font-weight:600;letter-spacing:0.08em;
+    padding:6px 11px;border:0;background:transparent;color:var(--stone-500);
+    cursor:pointer;line-height:1;
+  }
+  .langbar button.active{background:var(--stone-900);color:var(--stone-050);}
+  .langbar button:focus-visible{outline:2px solid var(--patina);outline-offset:-2px;}
+
+  /* ---------- form ---------- */
+  .panel{
+    background:#fff;
+    border:1px solid var(--stone-100);
+    border-radius:var(--radius);
+    padding:20px 18px;
+    margin-bottom:26px;
+  }
+  .panel-head{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    margin:0 0 16px;
+  }
+  .panel-head h2{
+    margin:0;font-size:12px;font-weight:600;
+    text-transform:uppercase;letter-spacing:0.14em;color:var(--stone-500);
+  }
+  .field{margin-bottom:14px;}
+  .field.pair{display:flex;gap:12px;}
+  .field.pair > div{flex:1;min-width:0;}
+  label{
+    display:block;font-size:12px;font-weight:500;
+    letter-spacing:0.03em;color:var(--stone-700);margin-bottom:5px;
+  }
+  input,select,textarea{
+    -webkit-appearance:none;appearance:none;
+    font-family:inherit;font-size:16px;color:var(--stone-900);
+    width:100%;padding:10px 11px;
+    border:1px solid var(--stone-300);border-radius:var(--radius);
+    background:#fff;line-height:1.3;
+  }
+  select{
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%236c736e' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 11px center;padding-right:32px;
+  }
+  input[type=number]{font-variant-numeric:tabular-nums;}
+  textarea{resize:vertical;min-height:62px;}
+  input:focus,select:focus,textarea:focus{
+    outline:none;border-color:var(--patina);box-shadow:0 0 0 3px rgba(74,107,93,0.14);
+  }
+  input.bad,select.bad{border-color:var(--alert);}
+  .hint{font-size:12px;color:var(--stone-500);margin-top:5px;min-height:0;}
+  .hint.err{color:var(--alert);}
+
+  .balance{
+    display:flex;align-items:baseline;justify-content:space-between;
+    border-top:1px solid var(--stone-100);
+    margin-top:18px;padding-top:14px;
+  }
+  .balance .lbl{font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--stone-500);}
+  .balance .val{
+    font-family:'Newsreader',Georgia,serif;font-size:26px;
+    font-variant-numeric:tabular-nums;line-height:1;
+  }
+
+  .btn{
+    -webkit-appearance:none;appearance:none;white-space:nowrap;
+    font-family:inherit;font-size:15px;font-weight:600;letter-spacing:0.02em;
+    width:100%;padding:14px 16px;margin-top:16px;
+    border:0;border-radius:var(--radius);
+    background:var(--patina-deep);color:#fff;cursor:pointer;line-height:1.2;
+  }
+  .btn:hover{background:var(--patina);}
+  .btn:focus-visible{outline:2px solid var(--stone-900);outline-offset:2px;}
+  .btn[disabled]{background:var(--stone-300);cursor:default;}
+
+  .btn-ghost{
+    -webkit-appearance:none;appearance:none;white-space:nowrap;
+    font-family:inherit;font-size:12px;font-weight:600;letter-spacing:0.06em;
+    padding:6px 11px;border:1px solid var(--stone-300);border-radius:var(--radius);
+    background:#fff;color:var(--stone-700);cursor:pointer;line-height:1.2;flex:none;
+  }
+  .btn-ghost:hover{border-color:var(--stone-500);}
+  .btn-ghost:focus-visible{outline:2px solid var(--patina);outline-offset:1px;}
+
+  /* ---------- status ---------- */
+  #status{display:none;margin:16px 0 0;padding:11px 13px;border-radius:var(--radius);font-size:14px;}
+  #status.show{display:block;}
+  #status.wait{background:#fdf7e8;border-left:3px solid var(--gold);color:#5c4a1c;}
+  #status.ok{background:#eef3f0;border-left:3px solid var(--patina);color:var(--patina-deep);}
+  #status.fail{background:#faeeec;border-left:3px solid var(--alert);color:var(--alert);}
+
+  /* ---------- history ---------- */
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  thead th{
+    text-align:left;font-size:10px;font-weight:600;
+    text-transform:uppercase;letter-spacing:0.1em;color:var(--stone-500);
+    padding:0 8px 7px 0;border-bottom:1px solid var(--stone-300);
+  }
+  thead th.num,tbody td.num{text-align:right;padding-right:0;font-variant-numeric:tabular-nums;}
+  tbody td{padding:10px 8px 10px 0;border-bottom:1px solid var(--stone-100);vertical-align:top;}
+  tbody tr.fresh td{background:#f2f6f4;}
+  .cust{font-weight:500;}
+  .svc{font-size:12px;color:var(--stone-500);}
+  .pay{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--stone-500);}
+  .empty{padding:22px 0;text-align:center;color:var(--stone-500);font-size:14px;}
+  .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+  @media (max-width:420px){
+    .field.pair{display:block;}
+    .field.pair > div{margin-bottom:14px;}
+    .field.pair > div:last-child{margin-bottom:0;}
+    .mark .name{font-size:23px;}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    tbody tr.fresh td{transition:background 1.2s ease;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="mark">
+      <span class="name">MK Stone</span>
+      <span class="rule"></span>
+      <span class="sub" data-i18n="masthead">Rejestr sprzedaży</span>
+    </div>
+    <div class="langbar">
+      <button type="button" id="btnPL" onclick="setLang('PL')">PL</button>
+      <button type="button" id="btnEN" onclick="setLang('EN')">EN</button>
+    </div>
+  </header>
+
+  <!-- ---------- capture ---------- -->
+  <section class="panel">
+    <div class="panel-head"><h2 data-i18n="formTitle">Nowa sprzedaż</h2></div>
+
+    <div class="field">
+      <label for="fDate" data-i18n="lblDate">Data sprzedaży</label>
+      <input type="date" id="fDate">
+    </div>
+
+    <div class="field">
+      <label for="fCustomer" data-i18n="lblCustomer">Klient</label>
+      <input type="text" id="fCustomer" list="customerList" autocomplete="off" spellcheck="false">
+      <datalist id="customerList"></datalist>
+      <div class="hint" id="hCustomer"></div>
+    </div>
+
+    <div class="field">
+      <label for="fService" data-i18n="lblService">Usługa</label>
+      <select id="fService">
+        <option value="" data-i18n="optChoose">— wybierz —</option>
+        <option value="Usługa pogrzebowa" data-i18n="svcFuneral">Usługa pogrzebowa</option>
+        <option value="Dopisek" data-i18n="svcInscription">Dopisek</option>
+      </select>
+      <div class="hint" id="hService"></div>
+    </div>
+
+    <div class="field pair">
+      <div>
+        <label for="fAmount" data-i18n="lblAmount">Kwota (zł)</label>
+        <input type="number" id="fAmount" inputmode="decimal" step="0.01" min="0" oninput="recalc()">
+        <div class="hint" id="hAmount"></div>
+      </div>
+      <div>
+        <label for="fDeposit" data-i18n="lblDeposit">Zaliczka (zł)</label>
+        <input type="number" id="fDeposit" inputmode="decimal" step="0.01" min="0" value="0" oninput="recalc()">
+        <div class="hint" id="hDeposit"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="fPayment" data-i18n="lblPayment">Forma płatności</label>
+      <select id="fPayment">
+        <option value="Gotówka" data-i18n="payCash">Gotówka</option>
+        <option value="Przelew" data-i18n="payTransfer">Przelew</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="fNotes" data-i18n="lblNotes">Uwagi</label>
+      <textarea id="fNotes" rows="2"></textarea>
+    </div>
+
+    <div class="balance">
+      <span class="lbl" data-i18n="lblBalance">Do zapłaty</span>
+      <span class="val" id="balanceVal">0,00 zł</span>
+    </div>
+
+    <button type="button" class="btn" id="btnSave" onclick="saveSale()">Zapisz sprzedaż</button>
+    <div id="status"></div>
+  </section>
+
+  <!-- ---------- history ---------- -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2 data-i18n="histTitle">Ostatnie sprzedaże</h2>
+      <button type="button" class="btn-ghost" id="btnRefresh" onclick="loadHistory()">Odśwież</button>
+    </div>
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="thDate">Data</th>
+            <th data-i18n="thCustomer">Klient</th>
+            <th class="num" data-i18n="thAmount">Kwota</th>
+            <th class="num" data-i18n="thDeposit">Zaliczka</th>
+            <th class="num" data-i18n="thBalance">Saldo</th>
+          </tr>
+        </thead>
+        <tbody id="histBody">
+          <tr><td colspan="5" class="empty" id="histMsg">Ładowanie…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ==========================================================
+   CONFIG — replace both values after deploying the Apps Script
+   ========================================================== */
+var SHEET_ID   = 'PASTE_SPREADSHEET_ID_HERE';
+var SCRIPT_URL = 'PASTE_APPS_SCRIPT_EXEC_URL_HERE';
+var SHEET_TAB  = 'Sales';
+
+/* ==========================================================
+   i18n — every key MUST exist in both EN and PL
+   ========================================================== */
+var T = {
+  PL: {
+    masthead:'Rejestr sprzedaży',
+    formTitle:'Nowa sprzedaż',
+    lblDate:'Data sprzedaży',
+    lblCustomer:'Klient',
+    lblService:'Usługa',
+    lblAmount:'Kwota (zł)',
+    lblDeposit:'Zaliczka (zł)',
+    lblPayment:'Forma płatności',
+    lblNotes:'Uwagi',
+    lblBalance:'Do zapłaty',
+    optChoose:'— wybierz —',
+    svcFuneral:'Usługa pogrzebowa',
+    svcInscription:'Dopisek',
+    payCash:'Gotówka',
+    payTransfer:'Przelew',
+    btnSave:'Zapisz sprzedaż',
+    btnSaving:'Zapisywanie…',
+    btnRefresh:'Odśwież',
+    histTitle:'Ostatnie sprzedaże',
+    thDate:'Data',
+    thCustomer:'Klient',
+    thAmount:'Kwota',
+    thDeposit:'Zaliczka',
+    thBalance:'Saldo',
+    histLoading:'Ładowanie…',
+    histEmpty:'Brak zapisanych sprzedaży.',
+    histError:'Nie udało się wczytać historii. Sprawdź połączenie i odśwież.',
+    stWait:'Zapisywanie — oczekiwanie na potwierdzenie z arkusza…',
+    stOk:'Zapisano. Sprzedaż widoczna w arkuszu.',
+    stFail:'Brak potwierdzenia zapisu. Sprawdź arkusz przed ponownym zapisem — inaczej powstanie duplikat.',
+    stConfig:'Uzupełnij SHEET_ID i SCRIPT_URL w pliku HTML.',
+    errCustomer:'Wpisz nazwę klienta.',
+    errService:'Wybierz usługę.',
+    errAmount:'Wpisz kwotę większą od zera.',
+    errDeposit:'Zaliczka nie może przekraczać kwoty.',
+    title:'MK Stone — Rejestr sprzedaży'
+  },
+  EN: {
+    masthead:'Sales register',
+    formTitle:'New sale',
+    lblDate:'Sale date',
+    lblCustomer:'Customer',
+    lblService:'Service',
+    lblAmount:'Amount (zł)',
+    lblDeposit:'Deposit (zł)',
+    lblPayment:'Payment method',
+    lblNotes:'Notes',
+    lblBalance:'Balance due',
+    optChoose:'— select —',
+    svcFuneral:'Funeral service',
+    svcInscription:'Inscription',
+    payCash:'Cash',
+    payTransfer:'Bank transfer',
+    btnSave:'Save sale',
+    btnSaving:'Saving…',
+    btnRefresh:'Refresh',
+    histTitle:'Recent sales',
+    thDate:'Date',
+    thCustomer:'Customer',
+    thAmount:'Amount',
+    thDeposit:'Deposit',
+    thBalance:'Balance',
+    histLoading:'Loading…',
+    histEmpty:'No sales recorded yet.',
+    histError:'Could not load history. Check the connection and refresh.',
+    stWait:'Saving — waiting for the sheet to confirm…',
+    stOk:'Saved. The sale is in the sheet.',
+    stFail:'The save was not confirmed. Check the sheet before saving again, or you will create a duplicate.',
+    stConfig:'Set SHEET_ID and SCRIPT_URL in the HTML file.',
+    errCustomer:'Enter a customer name.',
+    errService:'Choose a service.',
+    errAmount:'Enter an amount greater than zero.',
+    errDeposit:'The deposit cannot exceed the amount.',
+    title:'MK Stone — Sales register'
+  }
+};
+
+var lang = 'PL';
+var currentRecordId = null;
+var awaitingId = null;
+var confirmed = false;
+var historyRows = [];
+
+/* ---------- language ---------- */
+function setLang(code){
+  lang = (code === 'EN') ? 'EN' : 'PL';
+  var dict = T[lang];
+
+  // single pass — nothing else may set textContent on these elements
+  var nodes = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < nodes.length; i++){
+    var key = nodes[i].getAttribute('data-i18n');
+    if (dict[key] !== undefined) nodes[i].textContent = dict[key];
+  }
+
+  document.getElementById('btnPL').className = (lang === 'PL') ? 'active' : '';
+  document.getElementById('btnEN').className = (lang === 'EN') ? 'active' : '';
+  document.documentElement.lang = (lang === 'PL') ? 'pl' : 'en';
+  document.title = dict.title;
+
+  updateSaveButton();
+  document.getElementById('btnRefresh').textContent = dict.btnRefresh;
+  clearErrors();
+  recalc();
+  renderHistory();
+  try { localStorage.setItem('mkLang', lang); } catch(e){}
+}
+
+// the save button label lives here only — never in the data-i18n loop
+function updateSaveButton(){
+  var b = document.getElementById('btnSave');
+  b.textContent = b.disabled ? T[lang].btnSaving : T[lang].btnSave;
+}
+
+/* ---------- helpers ---------- */
+function money(n){
+  var v = Number(n) || 0;
+  return v.toFixed(2).replace('.', ',') + ' zł';
+}
+function num(id){
+  var raw = String(document.getElementById(id).value || '').replace(',', '.').trim();
+  var v = parseFloat(raw);
+  return isNaN(v) ? 0 : v;
+}
+function recalc(){
+  document.getElementById('balanceVal').textContent = money(num('fAmount') - num('fDeposit'));
+}
+function newRecordId(){
+  return 'MKS-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+}
+function clearErrors(){
+  ['fCustomer','fService','fAmount','fDeposit'].forEach(function(id){
+    document.getElementById(id).classList.remove('bad');
+  });
+  ['hCustomer','hService','hAmount','hDeposit'].forEach(function(id){
+    var el = document.getElementById(id);
+    el.textContent = ''; el.className = 'hint';
+  });
+}
+function flagError(fieldId, hintId, msgKey){
+  document.getElementById(fieldId).classList.add('bad');
+  var h = document.getElementById(hintId);
+  h.textContent = T[lang][msgKey];
+  h.className = 'hint err';
+}
+function status(kind, msgKey){
+  var s = document.getElementById('status');
+  if (!kind){ s.className = ''; s.textContent = ''; return; }
+  s.className = 'show ' + kind;
+  s.textContent = T[lang][msgKey];
+}
+
+/* ---------- submit (hidden iframe form POST) ---------- */
+function iframePost(url, data){
+  return new Promise(function(resolve){
+    var old = document.getElementById('_submitFrame');
+    if (old) old.parentNode.removeChild(old);
+
+    var iframe = document.createElement('iframe');
+    iframe.id = '_submitFrame';
+    iframe.name = '_submitFrame';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = url;
+    form.target = '_submitFrame';
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'payload';
+    input.value = JSON.stringify(data);
+    form.appendChild(input);
+    document.body.appendChild(form);
+
+    iframe.onload = function(){ try{ document.body.removeChild(form); }catch(e){} resolve(); };
+    form.submit();
+    setTimeout(function(){ try{ document.body.removeChild(form); }catch(e){} resolve(); }, 4000);
+  });
+}
+
+function saveSale(){
+  clearErrors();
+  if (SHEET_ID.indexOf('PASTE') === 0 || SCRIPT_URL.indexOf('PASTE') === 0){
+    status('fail','stConfig'); return;
+  }
+
+  var customer = document.getElementById('fCustomer').value.trim();
+  var service  = document.getElementById('fService').value;
+  var amount   = num('fAmount');
+  var deposit  = num('fDeposit');
+  var bad = false;
+
+  if (!customer){ flagError('fCustomer','hCustomer','errCustomer'); bad = true; }
+  if (!service){ flagError('fService','hService','errService'); bad = true; }
+  if (!(amount > 0)){ flagError('fAmount','hAmount','errAmount'); bad = true; }
+  if (deposit > amount){ flagError('fDeposit','hDeposit','errDeposit'); bad = true; }
+  if (bad) return;
+
+  var payload = {
+    _action:'saveSale',
+    recordId: currentRecordId,
+    saleDate: document.getElementById('fDate').value,
+    customer: customer,
+    service: service,            // stored in PL — matches Zoho item names
+    amount: amount,
+    deposit: deposit,
+    payment: document.getElementById('fPayment').value,  // stored in PL
+    notes: document.getElementById('fNotes').value.trim()
+  };
+
+  awaitingId = currentRecordId;
+  confirmed = false;
+  var btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  updateSaveButton();
+  status('wait','stWait');
+
+  iframePost(SCRIPT_URL, payload).then(function(){
+    setTimeout(function(){ loadHistory(checkConfirmed); }, 4000);
+    setTimeout(function(){ if (!confirmed) loadHistory(checkConfirmed); }, 9000);
+    setTimeout(function(){ if (!confirmed) finishSave(false); }, 13000);
+  });
+}
+
+function checkConfirmed(){
+  if (confirmed || !awaitingId) return;
+  for (var i = 0; i < historyRows.length; i++){
+    if (historyRows[i].recordId === awaitingId){ finishSave(true); return; }
+  }
+}
+
+function finishSave(ok){
+  confirmed = ok;
+  var btn = document.getElementById('btnSave');
+  btn.disabled = false;
+  updateSaveButton();
+  if (ok){
+    status('ok','stOk');
+    resetForm();
+  } else {
+    status('fail','stFail');
+  }
+  awaitingId = null;
+}
+
+function resetForm(){
+  document.getElementById('fCustomer').value = '';
+  document.getElementById('fService').value = '';
+  document.getElementById('fAmount').value = '';
+  document.getElementById('fDeposit').value = '0';
+  document.getElementById('fNotes').value = '';
+  document.getElementById('fPayment').value = 'Gotówka';
+  currentRecordId = newRecordId();
+  recalc();
+}
+
+/* ---------- history (gviz JSONP) ---------- */
+function gvizCell(c){
+  if (!c) return '';
+  if (c.v === null || c.v === undefined) return '';
+  return c.v;
+}
+function gvizDate(c){
+  var v = gvizCell(c);
+  if (v === '') return '';
+  if (v instanceof Date) return fmtDate(v);
+  var m = String(v).match(/^Date\((\d+),(\d+),(\d+)/);   // months are 0-indexed
+  if (m) return fmtDate(new Date(+m[1], +m[2], +m[3]));
+  var d = new Date(String(v));
+  return isNaN(d.getTime()) ? String(v) : fmtDate(d);
+}
+function fmtDate(d){
+  var p = function(n){ return (n < 10 ? '0' : '') + n; };
+  return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear();
+}
+
+function loadHistory(after){
+  var msg = document.getElementById('histMsg');
+  if (msg) msg.textContent = T[lang].histLoading;
+
+  var cb = 'gvizCB_' + Date.now();
+  var done = false;
+
+  window[cb] = function(resp){
+    done = true;
+    try {
+      var rows = resp.table.rows || [];
+      historyRows = [];
+      for (var i = 0; i < rows.length; i++){
+        var c = rows[i].c || [];
+        if (!gvizCell(c[2])) continue;                 // skip blank rows
+        historyRows.push({
+          date:     gvizDate(c[1]),
+          customer: String(gvizCell(c[2])),
+          service:  String(gvizCell(c[3])),
+          amount:   Number(gvizCell(c[4])) || 0,
+          deposit:  Number(gvizCell(c[5])) || 0,
+          payment:  String(gvizCell(c[7])),
+          recordId: String(gvizCell(c[9]))
+        });
+      }
+      historyRows.reverse();                            // newest first
+      renderHistory();
+      buildCustomerList();
+    } catch(e){
+      showHistMsg(T[lang].histError);
+    }
+    cleanup();
+    if (typeof after === 'function') after();
+  };
+
+  function cleanup(){
+    try { delete window[cb]; } catch(e){ window[cb] = undefined; }
+    var s = document.getElementById(cb);
+    if (s && s.parentNode) s.parentNode.removeChild(s);
+  }
+
+  var s = document.createElement('script');
+  s.id = cb;
+  s.src = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
+          '/gviz/tq?sheet=' + SHEET_TAB + '&tqx=responseHandler:' + cb +
+          '&_=' + Date.now();
+  s.onerror = function(){ showHistMsg(T[lang].histError); cleanup(); };
+  document.body.appendChild(s);
+
+  setTimeout(function(){ if (!done){ showHistMsg(T[lang].histError); cleanup(); } }, 12000);
+}
+
+function showHistMsg(text){
+  document.getElementById('histBody').innerHTML =
+    '<tr><td colspan="5" class="empty" id="histMsg"></td></tr>';
+  document.getElementById('histMsg').textContent = text;
+}
+
+function renderHistory(){
+  var body = document.getElementById('histBody');
+  if (!historyRows.length){ showHistMsg(T[lang].histEmpty); return; }
+
+  var svcLabel = {
+    'Usługa pogrzebowa': T[lang].svcFuneral,
+    'Dopisek': T[lang].svcInscription
+  };
+  var payLabel = { 'Gotówka': T[lang].payCash, 'Przelew': T[lang].payTransfer };
+
+  body.innerHTML = '';
+  historyRows.slice(0, 25).forEach(function(r){
+    var tr = document.createElement('tr');
+    if (r.recordId && r.recordId === awaitingId) tr.className = 'fresh';
+
+    var td1 = document.createElement('td');
+    td1.textContent = r.date;
+
+    var td2 = document.createElement('td');
+    var n = document.createElement('div'); n.className = 'cust'; n.textContent = r.customer;
+    var sv = document.createElement('div'); sv.className = 'svc';
+    sv.textContent = svcLabel[r.service] || r.service;
+    var pm = document.createElement('div'); pm.className = 'pay';
+    pm.textContent = payLabel[r.payment] || r.payment;
+    td2.appendChild(n); td2.appendChild(sv); td2.appendChild(pm);
+
+    var td3 = document.createElement('td'); td3.className = 'num'; td3.textContent = money(r.amount);
+    var td4 = document.createElement('td'); td4.className = 'num'; td4.textContent = money(r.deposit);
+    var td5 = document.createElement('td'); td5.className = 'num'; td5.textContent = money(r.amount - r.deposit);
+
+    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4); tr.appendChild(td5);
+    body.appendChild(tr);
+  });
+}
+
+function buildCustomerList(){
+  var seen = {}, dl = document.getElementById('customerList');
+  dl.innerHTML = '';
+  historyRows.forEach(function(r){
+    var name = r.customer;
+    if (!name || seen[name]) return;
+    seen[name] = true;
+    var o = document.createElement('option');
+    o.value = name;
+    dl.appendChild(o);
+  });
+}
+
+/* ---------- init ---------- */
+(function init(){
+  var d = new Date();
+  var p = function(n){ return (n < 10 ? '0' : '') + n; };
+  document.getElementById('fDate').value =
+    d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+
+  currentRecordId = newRecordId();
+
+  var saved = 'PL';
+  try { saved = localStorage.getItem('mkLang') || 'PL'; } catch(e){}
+  setLang(saved);
+
+  if (SHEET_ID.indexOf('PASTE') === 0){
+    showHistMsg(T[lang].stConfig);
+  } else {
+    loadHistory();
+  }
+})();
+</script>
+</body>
+</html>
