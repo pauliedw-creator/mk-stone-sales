@@ -7,174 +7,188 @@
 <title>MK Stone — Rejestr sprzedaży</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --stone-900:#1c1e1d;
-    --stone-700:#3d423f;
-    --stone-500:#6c736e;
-    --stone-300:#b9bdb8;
-    --stone-100:#e8e9e5;
-    --stone-050:#f4f4f1;
-    --patina:#4a6b5d;
-    --patina-deep:#2f4a3e;
+    --ink:#2e2a24;
+    --ink-soft:#6b6355;      /* label colour — 4.6:1 on card white */
+    --ink-faint:#a49c8d;
+    --line:#e3ddd0;
+    --line-in:#ded7c8;
+    --card:#ffffff;
+    --gold-lt:#e8cf85;
+    --gold:#b8912e;
+    --gold-dk:#8a6a1c;
     --alert:#8c3b2e;
-    --gold:#a8863f;
-    --radius:3px;
+    --ok:#4a6b5d;
+    --radius:2px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    font-family:'Inter Tight',system-ui,sans-serif;
-    background:var(--stone-050);
-    color:var(--stone-900);
+    font-family:'Jost',system-ui,sans-serif;
+    font-weight:400;
     font-size:16px;
     line-height:1.45;
+    color:var(--ink);
     -webkit-text-size-adjust:100%;
+    background:
+      radial-gradient(120% 55% at 10% 4%, rgba(255,255,255,.95), transparent 62%),
+      radial-gradient(90% 45% at 90% 20%, rgba(226,220,208,.5), transparent 58%),
+      linear-gradient(168deg,#faf8f4 0%,#f1ece3 46%,#f7f4ee 100%);
+    background-attachment:fixed;
   }
-  .wrap{max-width:640px;margin:0 auto;padding:0 16px 64px;}
+  .wrap{max-width:620px;margin:0 auto;padding:0 16px 60px;position:relative;}
+
+  /* faint veining, behind everything */
+  .wrap:before{
+    content:'';position:absolute;left:0;right:0;top:0;height:230px;pointer-events:none;z-index:0;
+    background:
+      linear-gradient(104deg,transparent 45.6%,rgba(174,164,146,.20) 46.1%,transparent 46.7%),
+      linear-gradient(84deg,transparent 61.7%,rgba(174,164,146,.13) 62.1%,transparent 62.7%),
+      linear-gradient(112deg,transparent 24%,rgba(174,164,146,.10) 24.4%,transparent 25%);
+  }
+  .wrap > *{position:relative;z-index:1;}
 
   /* ---------- masthead ---------- */
-  header{
-    border-bottom:2px solid var(--stone-900);
-    padding:22px 0 14px;
-    margin-bottom:26px;
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:12px;
+  header{padding:28px 0 0;margin-bottom:26px;}
+  .top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+  .eyebrow{
+    font-size:9px;letter-spacing:.32em;text-transform:uppercase;
+    color:var(--ink-faint);margin:0 0 7px;font-weight:400;
   }
-  .mark{display:flex;align-items:baseline;gap:10px;}
-  .mark .name{
-    font-family:'Newsreader',Georgia,serif;
-    font-size:28px;
-    letter-spacing:-0.01em;
-    line-height:1;
+  .wordmark{
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-weight:600;font-size:36px;line-height:.95;letter-spacing:.015em;margin:0;
+    background:linear-gradient(178deg,var(--gold-lt) 4%,var(--gold) 46%,var(--gold-dk) 96%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
   }
-  .mark .rule{
-    width:1px;height:20px;background:var(--stone-300);
+  .place{
+    font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--ink-faint);margin:5px 0 0;
   }
-  .mark .sub{
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:0.14em;
-    color:var(--stone-500);
-  }
-  .langbar{display:flex;gap:0;border:1px solid var(--stone-300);border-radius:var(--radius);overflow:hidden;flex:none;}
+  .gild{height:2px;margin-top:18px;background:linear-gradient(90deg,var(--gold-lt),var(--gold-dk) 52%,rgba(138,106,28,0));}
+
+  .langbar{display:flex;border:1px solid var(--line-in);border-radius:var(--radius);overflow:hidden;flex:none;background:#fff;}
   .langbar button{
     -webkit-appearance:none;appearance:none;white-space:nowrap;
-    font-family:inherit;font-size:12px;font-weight:600;letter-spacing:0.08em;
-    padding:6px 11px;border:0;background:transparent;color:var(--stone-500);
-    cursor:pointer;line-height:1;
+    font-family:inherit;font-size:11px;font-weight:500;letter-spacing:.12em;
+    padding:7px 11px;border:0;background:transparent;color:var(--ink-soft);cursor:pointer;line-height:1;
   }
-  .langbar button.active{background:var(--stone-900);color:var(--stone-050);}
-  .langbar button:focus-visible{outline:2px solid var(--patina);outline-offset:-2px;}
+  .langbar button.active{background:var(--ink);color:#faf8f4;}
+  .langbar button:focus-visible{outline:2px solid var(--gold);outline-offset:-2px;}
 
-  /* ---------- form ---------- */
+  /* ---------- panels ---------- */
   .panel{
-    background:#fff;
-    border:1px solid var(--stone-100);
+    background:var(--card);
+    border:1px solid var(--line);
     border-radius:var(--radius);
-    padding:20px 18px;
-    margin-bottom:26px;
+    padding:20px 17px;
+    margin-bottom:24px;
+    box-shadow:0 1px 2px rgba(120,108,86,.05);
   }
-  .panel-head{
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-    margin:0 0 16px;
-  }
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px;}
   .panel-head h2{
-    margin:0;font-size:12px;font-weight:600;
-    text-transform:uppercase;letter-spacing:0.14em;color:var(--stone-500);
+    margin:0;font-size:10px;font-weight:500;
+    text-transform:uppercase;letter-spacing:.24em;color:var(--ink-faint);
   }
-  .field{margin-bottom:14px;}
+
+  .field{margin-bottom:15px;}
   .field.pair{display:flex;gap:12px;}
   .field.pair > div{flex:1;min-width:0;}
   label{
-    display:block;font-size:12px;font-weight:500;
-    letter-spacing:0.03em;color:var(--stone-700);margin-bottom:5px;
+    display:block;font-size:11px;font-weight:400;
+    letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:6px;
   }
   input,select,textarea{
     -webkit-appearance:none;appearance:none;
-    font-family:inherit;font-size:16px;color:var(--stone-900);
-    width:100%;padding:10px 11px;
-    border:1px solid var(--stone-300);border-radius:var(--radius);
-    background:#fff;line-height:1.3;
+    font-family:inherit;font-size:16px;font-weight:400;color:var(--ink);
+    width:100%;padding:11px 12px;
+    border:1px solid var(--line-in);border-radius:var(--radius);
+    background:#fdfcfa;line-height:1.3;
   }
   select{
-    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%236c736e' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;background-position:right 11px center;padding-right:32px;
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%236b6355' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
   }
   input[type=number]{font-variant-numeric:tabular-nums;}
   textarea{resize:vertical;min-height:62px;}
   input:focus,select:focus,textarea:focus{
-    outline:none;border-color:var(--patina);box-shadow:0 0 0 3px rgba(74,107,93,0.14);
+    outline:none;border-color:var(--gold);background:#fff;
+    box-shadow:0 0 0 3px rgba(184,145,46,.15);
   }
   input.bad,select.bad{border-color:var(--alert);}
-  .hint{font-size:12px;color:var(--stone-500);margin-top:5px;min-height:0;}
+  .hint{font-size:12px;color:var(--ink-soft);margin-top:5px;}
   .hint.err{color:var(--alert);}
 
   .balance{
-    display:flex;align-items:baseline;justify-content:space-between;
-    border-top:1px solid var(--stone-100);
-    margin-top:18px;padding-top:14px;
+    display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+    border-top:1px solid var(--line);margin-top:20px;padding-top:16px;
   }
-  .balance .lbl{font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--stone-500);}
+  .balance .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--ink-soft);}
   .balance .val{
-    font-family:'Newsreader',Georgia,serif;font-size:26px;
-    font-variant-numeric:tabular-nums;line-height:1;
+    font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:32px;line-height:1;
+    font-variant-numeric:tabular-nums;
+    background:linear-gradient(178deg,#d8bd6a,var(--gold-dk));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
   }
 
   .btn{
     -webkit-appearance:none;appearance:none;white-space:nowrap;
-    font-family:inherit;font-size:15px;font-weight:600;letter-spacing:0.02em;
-    width:100%;padding:14px 16px;margin-top:16px;
-    border:0;border-radius:var(--radius);
-    background:var(--patina-deep);color:#fff;cursor:pointer;line-height:1.2;
+    font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+    width:100%;padding:16px;margin-top:18px;
+    border:1px solid var(--gold-dk);border-radius:var(--radius);
+    background:linear-gradient(176deg,#c9a743,var(--gold-dk));
+    color:#fffaf0;cursor:pointer;line-height:1.2;
+    text-shadow:0 1px 1px rgba(90,66,10,.5);
   }
-  .btn:hover{background:var(--patina);}
-  .btn:focus-visible{outline:2px solid var(--stone-900);outline-offset:2px;}
-  .btn[disabled]{background:var(--stone-300);cursor:default;}
+  .btn:hover{background:linear-gradient(176deg,#d3b153,#7a5c15);}
+  .btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+  .btn[disabled]{background:#cfc7b6;border-color:#bdb4a1;color:#fff;text-shadow:none;cursor:default;}
 
   .btn-ghost{
     -webkit-appearance:none;appearance:none;white-space:nowrap;
-    font-family:inherit;font-size:12px;font-weight:600;letter-spacing:0.06em;
-    padding:6px 11px;border:1px solid var(--stone-300);border-radius:var(--radius);
-    background:#fff;color:var(--stone-700);cursor:pointer;line-height:1.2;flex:none;
+    font-family:inherit;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
+    padding:7px 12px;border:1px solid var(--line-in);border-radius:var(--radius);
+    background:#fff;color:var(--ink-soft);cursor:pointer;line-height:1.2;flex:none;
   }
-  .btn-ghost:hover{border-color:var(--stone-500);}
-  .btn-ghost:focus-visible{outline:2px solid var(--patina);outline-offset:1px;}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--ink);}
+  .btn-ghost:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
 
   /* ---------- status ---------- */
-  #status{display:none;margin:16px 0 0;padding:11px 13px;border-radius:var(--radius);font-size:14px;}
+  #status{display:none;margin:16px 0 0;padding:12px 14px;border-radius:var(--radius);font-size:14px;line-height:1.4;}
   #status.show{display:block;}
-  #status.wait{background:#fdf7e8;border-left:3px solid var(--gold);color:#5c4a1c;}
-  #status.ok{background:#eef3f0;border-left:3px solid var(--patina);color:var(--patina-deep);}
+  #status.wait{background:#fbf5e6;border-left:3px solid var(--gold);color:#6b5417;}
+  #status.ok{background:#eef3f0;border-left:3px solid var(--ok);color:#2f4a3e;}
   #status.fail{background:#faeeec;border-left:3px solid var(--alert);color:var(--alert);}
 
   /* ---------- history ---------- */
   table{width:100%;border-collapse:collapse;font-size:14px;}
   thead th{
-    text-align:left;font-size:10px;font-weight:600;
-    text-transform:uppercase;letter-spacing:0.1em;color:var(--stone-500);
-    padding:0 8px 7px 0;border-bottom:1px solid var(--stone-300);
+    text-align:left;font-size:9px;font-weight:500;
+    text-transform:uppercase;letter-spacing:.18em;color:var(--ink-faint);
+    padding:0 8px 8px 0;border-bottom:1px solid var(--line-in);
   }
   thead th.num,tbody td.num{text-align:right;padding-right:0;font-variant-numeric:tabular-nums;}
-  tbody td{padding:10px 8px 10px 0;border-bottom:1px solid var(--stone-100);vertical-align:top;}
-  tbody tr.fresh td{background:#f2f6f4;}
+  tbody td{padding:12px 8px 12px 0;border-bottom:1px solid #f0ece2;vertical-align:top;}
+  tbody tr:last-child td{border-bottom:0;}
+  tbody tr.fresh td{background:#fdf8ea;}
   .cust{font-weight:500;}
-  .svc{font-size:12px;color:var(--stone-500);}
-  .pay{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--stone-500);}
-  .empty{padding:22px 0;text-align:center;color:var(--stone-500);font-size:14px;}
+  .svc{font-size:12px;color:var(--ink-soft);margin-top:1px;}
+  .pay{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-faint);margin-top:2px;}
+  .empty{padding:24px 0;text-align:center;color:var(--ink-soft);font-size:14px;}
   .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
   @media (max-width:420px){
     .field.pair{display:block;}
-    .field.pair > div{margin-bottom:14px;}
+    .field.pair > div{margin-bottom:15px;}
     .field.pair > div:last-child{margin-bottom:0;}
-    .mark .name{font-size:23px;}
+    .wordmark{font-size:30px;}
+    thead th{font-size:8px;letter-spacing:.14em;}
   }
   @media (prefers-reduced-motion:no-preference){
-    tbody tr.fresh td{transition:background 1.2s ease;}
+    tbody tr.fresh td{transition:background 1.4s ease;}
   }
 </style>
 </head>
@@ -182,15 +196,18 @@
 <div class="wrap">
 
   <header>
-    <div class="mark">
-      <span class="name">MK Stone</span>
-      <span class="rule"></span>
-      <span class="sub" data-i18n="masthead">Rejestr sprzedaży</span>
+    <div class="top-row">
+      <div>
+        <p class="eyebrow" data-i18n="eyebrow">Centrum Kamienia Naturalnego</p>
+        <h1 class="wordmark">MK Stone</h1>
+        <p class="place" data-i18n="masthead">Ćmielów · Rejestr sprzedaży</p>
+      </div>
+      <div class="langbar">
+        <button type="button" id="btnPL" onclick="setLang('PL')">PL</button>
+        <button type="button" id="btnEN" onclick="setLang('EN')">EN</button>
+      </div>
     </div>
-    <div class="langbar">
-      <button type="button" id="btnPL" onclick="setLang('PL')">PL</button>
-      <button type="button" id="btnEN" onclick="setLang('EN')">EN</button>
-    </div>
+    <div class="gild"></div>
   </header>
 
   <!-- ---------- capture ---------- -->
@@ -282,7 +299,7 @@
 
 <script>
 /* ==========================================================
-   CONFIG — replace both values after deploying the Apps Script
+   CONFIG — copy these two values from your current live file
    ========================================================== */
 var SHEET_ID   = '104GizB8IW1b6Up5cRgxOLUkH8kgz4QKzlTBWY5EcPuc';
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxVcJ3HsvXQ_PQOuPqsjQv7UzZrz6dDTeZLGrMVuUH5X9rohlrlZysfVhZeQIsOlVyA/exec';
@@ -293,7 +310,8 @@ var SHEET_TAB  = 'Sales';
    ========================================================== */
 var T = {
   PL: {
-    masthead:'Rejestr sprzedaży',
+    eyebrow:'Centrum Kamienia Naturalnego',
+    masthead:'Ćmielów · Rejestr sprzedaży',
     formTitle:'Nowa sprzedaż',
     lblDate:'Data sprzedaży',
     lblCustomer:'Klient',
@@ -331,7 +349,8 @@ var T = {
     title:'MK Stone — Rejestr sprzedaży'
   },
   EN: {
-    masthead:'Sales register',
+    eyebrow:'Natural Stone Centre',
+    masthead:'Ćmielów · Sales register',
     formTitle:'New sale',
     lblDate:'Sale date',
     lblCustomer:'Customer',
