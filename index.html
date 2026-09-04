@@ -228,11 +228,7 @@
 
     <div class="field">
       <label for="fService" data-i18n="lblService">Usługa</label>
-      <select id="fService">
-        <option value="" data-i18n="optChoose">— wybierz —</option>
-        <option value="Usługa pogrzebowa" data-i18n="svcFuneral">Usługa pogrzebowa</option>
-        <option value="Dopisek" data-i18n="svcInscription">Dopisek</option>
-      </select>
+      <select id="fService" onchange="onServiceChange()"></select>
       <div class="hint" id="hService"></div>
     </div>
 
@@ -306,6 +302,41 @@ var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxVcJ3HsvXQ_PQOuPqsjQv
 var SHEET_TAB  = 'Sales';
 
 /* ==========================================================
+   SERVICE CATALOGUE
+   'v' is the string written to the sheet and matched against
+   SALE_ITEMS in Apps Script — it MUST equal the Zoho item name
+   character for character. Plain hyphens only, never en dashes.
+   'price' pre-fills the amount field; null leaves it manual.
+   Options and labels are built from this array, so a service
+   can never exist in the dropdown without its translations.
+   ========================================================== */
+var GROUPS = ['grpFuneral','grpRemoval','grpCatacomb','grpEarth','grpOther'];
+
+var SERVICES = [
+  { v:'Usługa pogrzebowa - urna',                g:'grpFuneral',  k:'svcFunUrn',    price:700  },
+  { v:'Usługa pogrzebowa - trumna',              g:'grpFuneral',  k:'svcFunCoffin', price:1100 },
+
+  { v:'Likwidacja grobu - pojedynczy lastrykowy',g:'grpRemoval',  k:'svcRemSingle', price:1000 },
+  { v:'Likwidacja grobu - podwójny lastrykowy',  g:'grpRemoval',  k:'svcRemDouble', price:2000 },
+
+  { v:'Kasetka pod jedną urnę - lastrykowa',     g:'grpCatacomb', k:'svcCasTerr',   price:300  },
+  { v:'Kasetka pod jedną urnę - granitowa',      g:'grpCatacomb', k:'svcCasGran',   price:850  },
+  { v:'Katakumba betonowa wielournowa',          g:'grpCatacomb', k:'svcCatMulti',  price:1400 },
+  { v:'Katakumba grobowa pojedyncza',            g:'grpCatacomb', k:'svcCatSingle', price:2250 },
+  { v:'Katakumba grobowa podwójna',              g:'grpCatacomb', k:'svcCatDouble', price:4500 },
+  { v:'Katakumba grobowa potrójna',              g:'grpCatacomb', k:'svcCatTriple', price:7000 },
+  { v:'Katakumba grobowa poczwórna',             g:'grpCatacomb', k:'svcCatQuad',   price:9800 },
+
+  { v:'Grób ziemny - urna',                      g:'grpEarth',    k:'svcErtUrn',    price:200  },
+  { v:'Grób ziemny - pojedynczy (trumna)',       g:'grpEarth',    k:'svcErtSingle', price:500  },
+  { v:'Grób ziemny - podwójny (trumna)',         g:'grpEarth',    k:'svcErtDouble', price:1100 },
+  { v:'Grób ziemny - potrójny (trumna)',         g:'grpEarth',    k:'svcErtTriple', price:1800 },
+  { v:'Grób ziemny - poczwórny (trumna)',        g:'grpEarth',    k:'svcErtQuad',   price:2500 },
+
+  { v:'Dopisek',                                 g:'grpOther',    k:'svcInscript',  price:null }
+];
+
+/* ==========================================================
    i18n — every key MUST exist in both EN and PL
    ========================================================== */
 var T = {
@@ -322,8 +353,29 @@ var T = {
     lblNotes:'Uwagi',
     lblBalance:'Do zapłaty',
     optChoose:'— wybierz —',
-    svcFuneral:'Usługa pogrzebowa',
-    svcInscription:'Dopisek',
+    grpFuneral:'Usługa pogrzebowa',
+    grpRemoval:'Likwidacja starego grobu (lastryko)',
+    grpCatacomb:'Katakumby',
+    grpEarth:'Groby ziemne — kopanie',
+    grpOther:'Pozostałe',
+    svcFunUrn:'Urna',
+    svcFunCoffin:'Trumna',
+    svcRemSingle:'Pojedynczy lastrykowy',
+    svcRemDouble:'Podwójny lastrykowy',
+    svcCasTerr:'Kasetka pod jedną urnę — lastrykowa',
+    svcCasGran:'Kasetka pod jedną urnę — granitowa',
+    svcCatMulti:'Katakumba betonowa wielournowa',
+    svcCatSingle:'Katakumba grobowa pojedyncza',
+    svcCatDouble:'Katakumba grobowa podwójna',
+    svcCatTriple:'Katakumba grobowa potrójna',
+    svcCatQuad:'Katakumba grobowa poczwórna',
+    svcErtUrn:'Urna',
+    svcErtSingle:'Pojedynczy — trumna',
+    svcErtDouble:'Podwójny — trumna',
+    svcErtTriple:'Potrójny — trumna',
+    svcErtQuad:'Poczwórny — trumna',
+    svcInscript:'Dopisek',
+    hintPrice:'Cena z cennika — można zmienić.',
     payCash:'Gotówka',
     payTransfer:'Przelew',
     btnSave:'Zapisz sprzedaż',
@@ -361,8 +413,29 @@ var T = {
     lblNotes:'Notes',
     lblBalance:'Balance due',
     optChoose:'— select —',
-    svcFuneral:'Funeral service',
-    svcInscription:'Inscription',
+    grpFuneral:'Funeral service',
+    grpRemoval:'Removal of an old grave (terrazzo)',
+    grpCatacomb:'Catacombs',
+    grpEarth:'Earth graves — digging',
+    grpOther:'Other',
+    svcFunUrn:'Urn',
+    svcFunCoffin:'Coffin',
+    svcRemSingle:'Single terrazzo',
+    svcRemDouble:'Double terrazzo',
+    svcCasTerr:'Casket for a single urn — terrazzo',
+    svcCasGran:'Casket for a single urn — granite',
+    svcCatMulti:'Concrete multi-urn catacomb',
+    svcCatSingle:'Single grave catacomb',
+    svcCatDouble:'Double grave catacomb',
+    svcCatTriple:'Triple grave catacomb',
+    svcCatQuad:'Quadruple grave catacomb',
+    svcErtUrn:'Urn',
+    svcErtSingle:'Single — coffin',
+    svcErtDouble:'Double — coffin',
+    svcErtTriple:'Triple — coffin',
+    svcErtQuad:'Quadruple — coffin',
+    svcInscript:'Inscription',
+    hintPrice:'List price — editable.',
     payCash:'Cash',
     payTransfer:'Bank transfer',
     btnSave:'Save sale',
@@ -414,7 +487,9 @@ function setLang(code){
 
   updateSaveButton();
   document.getElementById('btnRefresh').textContent = dict.btnRefresh;
+  buildServiceSelect();
   clearErrors();
+  refreshPriceHint();
   recalc();
   renderHistory();
   try { localStorage.setItem('mkLang', lang); } catch(e){}
@@ -424,6 +499,74 @@ function setLang(code){
 function updateSaveButton(){
   var b = document.getElementById('btnSave');
   b.textContent = b.disabled ? T[lang].btnSaving : T[lang].btnSave;
+}
+
+/* ---------- service select ---------- */
+function serviceByValue(v){
+  for (var i = 0; i < SERVICES.length; i++){ if (SERVICES[i].v === v) return SERVICES[i]; }
+  return null;
+}
+function isListPrice(v){
+  for (var i = 0; i < SERVICES.length; i++){
+    if (SERVICES[i].price !== null && Math.abs(SERVICES[i].price - v) < 0.005) return true;
+  }
+  return false;
+}
+
+// Rebuilt on every language switch. Options come from SERVICES only,
+// so a service cannot appear without both translations existing.
+function buildServiceSelect(){
+  var sel = document.getElementById('fService');
+  var keep = sel.value;
+  sel.innerHTML = '';
+
+  var first = document.createElement('option');
+  first.value = '';
+  first.textContent = T[lang].optChoose;
+  sel.appendChild(first);
+
+  GROUPS.forEach(function(gKey){
+    var members = SERVICES.filter(function(s){ return s.g === gKey; });
+    if (!members.length) return;
+    var og = document.createElement('optgroup');
+    og.label = T[lang][gKey];              // optgroups use .label, not textContent
+    members.forEach(function(s){
+      var o = document.createElement('option');
+      o.value = s.v;
+      o.textContent = T[lang][s.k];
+      og.appendChild(o);
+    });
+    sel.appendChild(og);
+  });
+
+  sel.value = keep;
+}
+
+function onServiceChange(){
+  var svc = serviceByValue(document.getElementById('fService').value);
+  var amtEl = document.getElementById('fAmount');
+  var current = num('fAmount');
+
+  // Overwrite only an empty field or an untouched list price —
+  // a manually typed amount is never clobbered.
+  if (svc && svc.price !== null && (current === 0 || isListPrice(current))){
+    amtEl.value = svc.price;
+  }
+  clearErrors();
+  refreshPriceHint();
+  recalc();
+}
+
+function refreshPriceHint(){
+  var svc = serviceByValue(document.getElementById('fService').value);
+  var h = document.getElementById('hAmount');
+  if (h.className.indexOf('err') > -1) return;      // never overwrite a validation error
+  if (svc && svc.price !== null && isListPrice(num('fAmount'))){
+    h.textContent = T[lang].hintPrice;
+    h.className = 'hint';
+  } else {
+    h.textContent = '';
+  }
 }
 
 /* ---------- helpers ---------- */
@@ -565,6 +708,7 @@ function resetForm(){
   document.getElementById('fDeposit').value = '0';
   document.getElementById('fNotes').value = '';
   document.getElementById('fPayment').value = 'Gotówka';
+  document.getElementById('hAmount').textContent = '';
   currentRecordId = newRecordId();
   recalc();
 }
@@ -651,10 +795,13 @@ function renderHistory(){
   var body = document.getElementById('histBody');
   if (!historyRows.length){ showHistMsg(T[lang].histEmpty); return; }
 
-  var svcLabel = {
-    'Usługa pogrzebowa': T[lang].svcFuneral,
-    'Dopisek': T[lang].svcInscription
-  };
+  // Group + service, so 'Urna' is never ambiguous in the list
+  var svcLabel = {};
+  SERVICES.forEach(function(s){
+    svcLabel[s.v] = (s.g === 'grpOther')
+      ? T[lang][s.k]
+      : T[lang][s.g] + ' · ' + T[lang][s.k];
+  });
   var payLabel = { 'Gotówka': T[lang].payCash, 'Przelew': T[lang].payTransfer };
 
   body.innerHTML = '';
